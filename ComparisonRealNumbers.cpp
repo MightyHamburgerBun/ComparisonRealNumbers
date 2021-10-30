@@ -37,11 +37,8 @@ std::string part(std::string realNumber, int p)
         if (p == 2) return "0";
     }
     std::string xPart;
-    for (int i = 0; i < p; i++)
-    {
-        xPart = realNumber.substr(0,realNumber.find('.'));
-        realNumber = realNumber.substr(realNumber.find('.') + 1);
-    }
+    if (p == 1) xPart = realNumber.substr(0,realNumber.find('.'));
+    if (p == 2) xPart = realNumber.substr(realNumber.find('.') + 1);
     if (xPart == "-" || xPart.length() == 0) xPart += '0';
     return xPart;
 }
@@ -50,7 +47,7 @@ std::string normalFractional(std::string fractional)
 {
     for (int i = fractional.length() - 1; i > 0; i--)
     {
-        if (fractional[i] == '0') fractional = fractional.substr(0,fractional.length() - 2);
+        if (fractional[i] == '0') fractional = fractional.substr(0,i);
         else break;
     }
     return fractional;
@@ -79,14 +76,16 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
         if (integerTwo[0] == '-') return 2;
     }
     //отброс лишних нулей
-    for (int i = 0; i < integerOne.length() - 1; i++)
+    int stop = integerOne.length();
+    for (int i = 0; i < stop; i++)
     {
-        if (integerOne[i] == '0') integerOne = integerOne.substr(1);
+        if (integerOne[0] == '0') integerOne = integerOne.substr(1);
         else break;
     }
-    for (int i = 0; i < integerTwo.length() - 1; i++)
+    stop = integerTwo.length();
+    for (int i = 0; i < stop; i++)
     {
-        if (integerTwo[i] == '0') integerTwo = integerTwo.substr(1);
+        if (integerTwo[0] == '0') integerTwo = integerTwo.substr(1);
         else break;
     }
     //сравнение целой части
@@ -95,58 +94,55 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
         if (!negative) return 2;
         else return 1;
     }
-    else if (integerOne.length() < integerTwo.length())
+    if (integerOne.length() < integerTwo.length())
     {
         if (!negative) return 1;
         else return 2;
     }
-    else
+    for (int i = 0; i < integerOne.length(); i++)
     {
-        for (int i = 0; i < integerOne.length(); i++)
+        if (integerOne[i] == integerTwo[i]) continue;
+        if (integerOne[i] > integerTwo[i])
         {
-            if (integerOne[i] == integerTwo[i]) continue;
-            if (integerOne[i] > integerTwo[i])
-            {
-                if (!negative) return 2;
-                else return 1;
-            }
-            else
-            {
-                if (!negative) return 1;
-                else return 2;
-            }
+            if (!negative) return 2;
+            else return 1;
         }
-        std::string fractionalOne = normalFractional(part(realNumberOne,2));
-        std::string fractionalTwo = normalFractional(part(realNumberTwo,2));
-        // выравнивание длины дробных частей
-        if (fractionalOne.length() > fractionalTwo.length())
+        else
         {
-            for (int i = fractionalTwo.length(); i != fractionalOne.length(); i++)
-            {
-                fractionalTwo += '0';
-            }
+            if (!negative) return 1;
+            else return 2;
         }
-        else if (fractionalOne.length() < fractionalTwo.length())
+    }
+    std::string fractionalOne = normalFractional(part(realNumberOne,2));
+    std::string fractionalTwo = normalFractional(part(realNumberTwo,2));
+    // выравнивание длины дробных частей
+    if (fractionalOne.length() > fractionalTwo.length())
+    {
+        for (int i = fractionalTwo.length(); i != fractionalOne.length(); i++)
         {
-            for (int i = fractionalOne.length(); i != fractionalTwo.length(); i++)
-            {
-                fractionalOne += '0';
-            }
+            fractionalTwo += '0';
         }
-        // сравнивание дробной части
-        for (int i = 0; i < fractionalOne.length(); i++)
+    }
+    else if (fractionalOne.length() < fractionalTwo.length())
+    {
+        for (int i = fractionalOne.length(); i != fractionalTwo.length(); i++)
         {
-            if (fractionalOne[i] == fractionalTwo[i]) continue;
-            if ((fractionalOne[i] > fractionalTwo[i]))
-            {
-                if (!negative) return 2;
-                else return 1;
-            }
-            else
-            {
-                if (!negative) return 1;
-                else return 2;
-            }
+            fractionalOne += '0';
+        }
+    }
+    // сравнивание дробной части
+    for (int i = 0; i < fractionalOne.length(); i++)
+    {
+        if (fractionalOne[i] == fractionalTwo[i]) continue;
+        if ((fractionalOne[i] > fractionalTwo[i]))
+        {
+            if (!negative) return 2;
+            else return 1;
+        }
+        else
+        {
+            if (!negative) return 1;
+            else return 2;
         }
     }
     return 3;
