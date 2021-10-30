@@ -60,29 +60,27 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
     // 3 - Equal
     std::string integerOne = part(realNumberOne,1);
     std::string integerTwo = part(realNumberTwo,1);
-    // отброс минуса и флаг на будущее, если оба отрицательные
-    bool negative = false;
+    // отброс минуса и флаг на будущее
+    bool negativeOne = false;
+    bool negativeTwo = false;
     if (integerOne[0] == '-')
     {
-        if (integerTwo[0] == '-')
-        {
-            negative = true;
-            integerOne = integerOne.substr(1);
-            integerTwo = integerTwo.substr(1);
-        }
-        else return 1;
+        integerOne = integerOne.substr(1);
+        negativeOne = true;
     }
-    else {
-        if (integerTwo[0] == '-') return 2;
+    if (integerTwo[0] == '-')
+    {
+        integerTwo = integerTwo.substr(1);
+        negativeTwo = true;
     }
     //отброс лишних нулей
-    int stop = integerOne.length();
+    int stop = integerOne.length() - 1;
     for (int i = 0; i < stop; i++)
     {
         if (integerOne[0] == '0') integerOne = integerOne.substr(1);
         else break;
     }
-    stop = integerTwo.length();
+    stop = integerTwo.length() - 1;
     for (int i = 0; i < stop; i++)
     {
         if (integerTwo[0] == '0') integerTwo = integerTwo.substr(1);
@@ -91,12 +89,12 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
     //сравнение целой части
     if (integerOne.length() > integerTwo.length())
     {
-        if (!negative) return 2;
+        if (!negativeOne && !negativeTwo) return 2;
         else return 1;
     }
     if (integerOne.length() < integerTwo.length())
     {
-        if (!negative) return 1;
+        if (!negativeOne && !negativeTwo) return 1;
         else return 2;
     }
     for (int i = 0; i < integerOne.length(); i++)
@@ -104,12 +102,12 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
         if (integerOne[i] == integerTwo[i]) continue;
         if (integerOne[i] > integerTwo[i])
         {
-            if (!negative) return 2;
+            if (!negativeOne && !negativeTwo) return 2;
             else return 1;
         }
         else
         {
-            if (!negative) return 1;
+            if (!negativeOne && !negativeTwo) return 1;
             else return 2;
         }
     }
@@ -136,15 +134,19 @@ int comparison(std::string realNumberOne, std::string realNumberTwo)
         if (fractionalOne[i] == fractionalTwo[i]) continue;
         if ((fractionalOne[i] > fractionalTwo[i]))
         {
-            if (!negative) return 2;
+            if (!negativeOne && !negativeTwo) return 2;
             else return 1;
         }
         else
         {
-            if (!negative) return 1;
+            if (!negativeOne && !negativeTwo) return 1;
             else return 2;
         }
     }
+    //если численно равны, проверяем с учётом знака
+    if (integerOne == "0") return 3;
+    if (!negativeOne && negativeTwo) return 2;
+    if (negativeOne && !negativeTwo) return 1;
     return 3;
 }
 
